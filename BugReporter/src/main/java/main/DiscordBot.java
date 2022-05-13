@@ -30,10 +30,6 @@ public class DiscordBot {
 	 * Command manager to perform commands
 	 */
 	private CommandManager m_CmdManager;
-	/**
-	 * Channel manager for the configurations of the textchannel
-	 */
-	private BugchannelManager m_ChannelManager;
 	public static JDABuilder builder;
 
 	public static void main(String[] args) throws LoginException {
@@ -49,7 +45,6 @@ public class DiscordBot {
 		builder = JDABuilder.createDefault("");
 
 		m_CmdManager = new CommandManager();
-		m_ChannelManager = new BugchannelManager();
 		builder.setStatus(OnlineStatus.ONLINE);
 		builder.setActivity(Activity.watching("Bugreports"));
 		builder.addEventListeners(new CommandListener());
@@ -58,12 +53,10 @@ public class DiscordBot {
 		m_ShardManager = builder.build();
 	}
 
+	
+	
 	public CommandManager getCmdManager() {
 		return m_CmdManager;
-	}
-
-	public BugchannelManager getChannelManager() {
-		return m_ChannelManager;
 	}
 
 	public JDA getShardManager() {

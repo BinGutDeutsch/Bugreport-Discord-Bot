@@ -1,5 +1,11 @@
 package main;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.Properties;
+
 /**
  * Helpclass to configurate the channel names. If you want to configure the
  * channel names, just rename the member attributes.
@@ -8,30 +14,38 @@ package main;
  *
  */
 public class BugchannelManager {
-	/**
-	 * if want to but a blank char in the name u have to fill it with "-"
-	 * 
-	 * if you want to put emojis in -> follow example below
-	 */
-	private String m_Report = "「📖」bugs-melden";
-	private String m_Open = "「📖」bugs-offen";
-	private String m_Accepted = "「📖」bugs-angenommen";
-	private String m_Denied = "「📖」bugs-abgelehnt";
+	public static String m_Report;
+	public static String m_Open;
+	public static String m_Accepted;
+	public static String m_Denied;
+	public static String m_ManageRole;
 
-	public String getReport() {
-		return m_Report;
+	public static void update() {
+		m_Report = getConfigProp("report_channel_id");
+		m_Open = getConfigProp("open_channel_id");
+		m_Accepted = getConfigProp("accepted_channel_id");
+		m_Denied = getConfigProp("denied_channel_id");
+		m_ManageRole = getConfigProp("role_id");
 	}
 
-	public String getOpen() {
-		return m_Open;
-	}
+	private static String getConfigProp(String channel) {
+		File configFile = new File("bugreport.properties");
+		String host = "";
+		try {
+			FileReader reader = new FileReader(configFile);
+			Properties props = new Properties();
+			props.load(reader);
 
-	public String getAccepted() {
-		return m_Accepted;
-	}
+			host = props.getProperty(channel);
 
-	public String getDenied() {
-		return m_Denied;
+			reader.close();
+		} catch (FileNotFoundException ex) {
+			// file does not exist
+		} catch (IOException ex) {
+			// I/O error
+		}
+		return host;
 	}
+	
 
 }
