@@ -2,7 +2,7 @@ package listener;
 
 import java.awt.Color;
 
-import main.DiscordBot;
+import main.BugchannelManager;
 import main.MessageBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -30,12 +30,12 @@ public class ReportManageListener extends ListenerAdapter {
 	@Override
 	public void onButtonInteraction(ButtonInteractionEvent event) {
 		TextChannel textChannel = event.getTextChannel();
-		if (!textChannel.getName().toLowerCase().contains(DiscordBot.getCurrentBot().getChannelManager().getOpen())) {
+		Guild guild = event.getGuild();
+		if (!textChannel.equals(guild.getTextChannelById(BugchannelManager.m_Open))) {
 			return;
 		}
 		Member m = event.getMember();
-		Guild guild = event.getGuild();
-		if (!m.getRoles().contains(guild.getRolesByName("Bugs verwalten", true).get(0))) {
+		if (!m.getRoles().contains(guild.getRoleById(BugchannelManager.m_ManageRole))) {
 			event.replyEmbeds(MessageBuilder.createEmbed(
 					"> Du hast keine **Berechtigung** um Bugs zu verwalten. \n > Sollte dies ein Fehler sein melde dich bei der Administration."))
 					.setEphemeral(true).queue();
@@ -43,12 +43,10 @@ public class ReportManageListener extends ListenerAdapter {
 		}
 
 		if (event.getComponentId().equals("Annehmen")) {
-			moveReport(event.getMessageId(), textChannel, guild
-					.getTextChannelsByName(DiscordBot.getCurrentBot().getChannelManager().getAccepted(), false).get(0),
-					m, Color.green, true);
+			moveReport(event.getMessageId(), textChannel, guild.getTextChannelById(BugchannelManager.m_Accepted), m,
+					Color.green, true);
 		} else if (event.getComponentId().equals("Ablehnen")) {
-			moveReport(event.getMessageId(), textChannel, guild
-					.getTextChannelsByName(DiscordBot.getCurrentBot().getChannelManager().getDenied(), false).get(0), m,
+			moveReport(event.getMessageId(), textChannel, guild.getTextChannelById(BugchannelManager.m_Denied), m,
 					Color.red, false);
 		}
 	}

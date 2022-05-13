@@ -2,11 +2,14 @@ package listener;
 
 import java.awt.Color;
 
+import main.BugchannelManager;
 import main.DiscordBot;
 import main.MessageBuilder;
 import net.dv8tion.jda.api.entities.ChannelType;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -34,22 +37,29 @@ public class ReportListener extends ListenerAdapter {
 			return;
 		}
 		TextChannel textChannel = event.getTextChannel();
-
-		if (!textChannel.getName().toLowerCase().contains(DiscordBot.getCurrentBot().getChannelManager().getReport())) {
+		Guild guild = event.getGuild();
+		if (!textChannel.equals(guild.getTextChannelById(BugchannelManager.m_Report))) {
+			System.out.println(DiscordBot.getCurrentBot().getShardManager().getTextChannelById(BugchannelManager.m_Report));
 			return;
 		}
 
 		if (event.getMessage().isWebhookMessage()) {
 			return;
 		}
+		System.out.println("rtichtige channel");
 
-		event.getGuild().getTextChannelsByName(DiscordBot.getCurrentBot().getChannelManager().getOpen(), true).get(0)
+		guild.getTextChannelById(BugchannelManager.m_Open)
 				.sendMessageEmbeds(MessageBuilder.createReport(m,
 						"> **User:** " + m.getUser().getAsTag() + " \n" + "> **Description:** " + msg, Color.gray,
 						null))
 				.setActionRow(Button.success("Annehmen", "Annehmen"), Button.danger("Ablehnen", "Ablehnen")).queue();
 		event.getMessage().delete().queue();
 
+	}
+	
+	@Override
+	public void onReady(ReadyEvent event) {
+		BugchannelManager.update();
 	}
 
 }
