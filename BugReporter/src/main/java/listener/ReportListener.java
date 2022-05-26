@@ -39,24 +39,22 @@ public class ReportListener extends ListenerAdapter {
 		TextChannel textChannel = event.getTextChannel();
 		Guild guild = event.getGuild();
 		if (!textChannel.equals(guild.getTextChannelById(BugchannelManager.m_Report))) {
-			System.out.println(DiscordBot.getCurrentBot().getShardManager().getTextChannelById(BugchannelManager.m_Report));
 			return;
 		}
 
 		if (event.getMessage().isWebhookMessage()) {
 			return;
 		}
-		System.out.println("rtichtige channel");
 
-		guild.getTextChannelById(BugchannelManager.m_Open)
-				.sendMessageEmbeds(MessageBuilder.createReport(m,
-						"> **User:** " + m.getUser().getAsTag() + " \n" + "> **Description:** " + msg, Color.gray,
-						null))
-				.setActionRow(Button.success("Annehmen", "Annehmen"), Button.danger("Ablehnen", "Ablehnen")).queue();
+		guild.getTextChannelById(BugchannelManager.m_Progress).sendMessageEmbeds(MessageBuilder.createReport(m,
+				"> **User:** " + m.getUser().getAsTag() + " \n" + "> **Description:** " + msg, Color.gray, null, "Offen"))
+				.setActionRow(Button.success("bearbeitet", "Bearbeitet"), Button.primary("pruef", "In Prüfung"),
+						Button.primary("inBearbeitung", "In Bearbeitung"), Button.danger("keinBug", "Kein Bug"))
+				.queue();
 		event.getMessage().delete().queue();
 
 	}
-	
+
 	@Override
 	public void onReady(ReadyEvent event) {
 		BugchannelManager.update();

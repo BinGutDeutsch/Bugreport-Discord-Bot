@@ -5,6 +5,7 @@ import java.util.EnumSet;
 import java.util.List;
 
 import command.ICommand;
+import main.BugchannelManager;
 import main.MessageBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Category;
@@ -95,15 +96,13 @@ public class SetupCommand implements ICommand {
 		List<Category> categorys = guild.getCategoriesByName("Bugs", true);
 		Category category = categorys.get(0);
 		category.createTextChannel("bugs-melden").queue();
+		category.createTextChannel("bugs-progress")
+				.addPermissionOverride(guild.getPublicRole(), EnumSet.of(Permission.MESSAGE_SEND),
+						EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_ADD_REACTION))
+				.addPermissionOverride(guild.getRoleById(BugchannelManager.m_ManageRole), EnumSet.of(Permission.VIEW_CHANNEL),
+						EnumSet.of(Permission.VIEW_CHANNEL, Permission.MESSAGE_ADD_REACTION))
+				.queue();
 		category.createTextChannel("bugs-offen")
-				.addPermissionOverride(guild.getPublicRole(), EnumSet.of(Permission.VIEW_CHANNEL),
-						EnumSet.of(Permission.MESSAGE_SEND, Permission.MESSAGE_ADD_REACTION))
-				.queue();
-		category.createTextChannel("bugs-angenommen")
-				.addPermissionOverride(guild.getPublicRole(), EnumSet.of(Permission.VIEW_CHANNEL),
-						EnumSet.of(Permission.MESSAGE_SEND, Permission.MESSAGE_ADD_REACTION))
-				.queue();
-		category.createTextChannel("bugs-abgelehnt")
 				.addPermissionOverride(guild.getPublicRole(), EnumSet.of(Permission.VIEW_CHANNEL),
 						EnumSet.of(Permission.MESSAGE_SEND, Permission.MESSAGE_ADD_REACTION))
 				.queue();
