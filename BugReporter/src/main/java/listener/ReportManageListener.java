@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
 /**
  * Listener for the management of the bugreports. Listens to Button interactions
@@ -31,7 +32,7 @@ public class ReportManageListener extends ListenerAdapter {
 	public void onButtonInteraction(ButtonInteractionEvent event) {
 		TextChannel textChannel = event.getTextChannel();
 		Guild guild = event.getGuild();
-		if (!textChannel.equals(guild.getTextChannelById(BugchannelManager.m_Open))) {
+		if (!textChannel.equals(guild.getTextChannelById(BugchannelManager.m_Progress))) {
 			return;
 		}
 		Member m = event.getMember();
@@ -42,12 +43,14 @@ public class ReportManageListener extends ListenerAdapter {
 			return;
 		}
 
-		if (event.getComponentId().equals("Annehmen")) {
-			moveReport(event.getMessageId(), textChannel, guild.getTextChannelById(BugchannelManager.m_Accepted), m,
-					Color.green, true);
-		} else if (event.getComponentId().equals("Ablehnen")) {
-			moveReport(event.getMessageId(), textChannel, guild.getTextChannelById(BugchannelManager.m_Denied), m,
-					Color.red, false);
+		if (event.getComponentId().equals("bearbeitet")) {
+			moveReport(event.getMessageId(), guild, m, Color.green, true, "Bearbeitet");
+		} else if (event.getComponentId().equals("inBearbeitung")) {
+			moveReport(event.getMessageId(), guild, m, Color.yellow, false, "In Bearbeitung");
+		} else if (event.getComponentId().equals("pruef")) {
+			moveReport(event.getMessageId(), guild, m, Color.yellow, false, "In Prüfung");
+		} else if (event.getComponentId().equals("keinBug")) {
+			moveReport(event.getMessageId(), guild, m, Color.red, false, "Kein Bug");
 		}
 	}
 
@@ -56,17 +59,24 @@ public class ReportManageListener extends ListenerAdapter {
 	 * textchannel.
 	 * 
 	 * @param messageID the message which has to be moved
-	 * @param tcFrom    the channel from where the message has to be moved
-	 * @param tcTo      the channel where the message to be moved to
+	 * @param guild		the guild to get the necessary textchannels
 	 * @param member    the member who managed the bugreport
 	 * @param color     the color for the embedmessage
 	 * @param accepted  if the bugreport got accepted or denied
 	 */
-	private void moveReport(String messageID, TextChannel tcFrom, TextChannel tcTo, Member member, Color color,
-			boolean accepted) {
-		tcFrom.retrieveMessageById(messageID).queue((msg) -> {
-			tcTo.sendMessageEmbeds(
-					MessageBuilder.createReport(member, msg.getEmbeds().get(0).getDescription(), color, accepted))
+	private void moveReport(String messageID, Guild guild, Member member, Color color, boolean accepted, String status) {
+
+		TextChannel tcProg = guild.getTextChannelById(BugchannelManager.m_Progress);
+		TextChannel tcOpen = guild.getTextChannelById(BugchannelManager.m_Managed);
+
+		tcProg.retrieveMessageById(messageID).queue((msg) -> {
+			tcOpen.sendMessageEmbeds(MessageBuilder.createReport(member, msg.getEmbeds().get(0).getDescription(), color,
+					accepted, status)).queue();
+
+			tcProg.sendMessageEmbeds(MessageBuilder.createReport(member, msg.getEmbeds().get(0).getDescription(), color,
+					accepted, status))
+					.setActionRow(Button.success("bearbeitet", "Bearbeitet"), Button.primary("pruef", "In Prüfung"),
+							Button.primary("inBearbeitung", "In Bearbeitung"), Button.danger("keinBug", "Kein Bug"))
 					.queue();
 			msg.delete().queue();
 		});

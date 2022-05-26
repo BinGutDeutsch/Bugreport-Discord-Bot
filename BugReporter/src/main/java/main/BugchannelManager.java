@@ -7,24 +7,22 @@ import java.io.IOException;
 import java.util.Properties;
 
 /**
- * Helpclass to configurate the channel names. If you want to configure the
- * channel names, just rename the member attributes.
+ * Helpclass to configurate the channel names. Channel IDs have to be put in the
+ * bugreport.properties manuelly
  * 
  * @author jonaw
  *
  */
 public class BugchannelManager {
 	public static String m_Report;
-	public static String m_Open;
-	public static String m_Accepted;
-	public static String m_Denied;
+	public static String m_Managed;
+	public static String m_Progress;
 	public static String m_ManageRole;
 
 	public static void update() {
 		m_Report = getConfigProp("report_channel_id");
-		m_Open = getConfigProp("open_channel_id");
-		m_Accepted = getConfigProp("accepted_channel_id");
-		m_Denied = getConfigProp("denied_channel_id");
+		m_Managed = getConfigProp("managed_channel_id");
+		m_Progress = getConfigProp("progress_channel_id");
 		m_ManageRole = getConfigProp("role_id");
 	}
 
@@ -46,6 +44,5 @@ public class BugchannelManager {
 		}
 		return host;
 	}
-	
 
 }

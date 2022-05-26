@@ -23,25 +23,26 @@ public class MessageBuilder {
 	 *                    bugreport
 	 * @param description The description of the bugreport
 	 * @param color       The color of the embeded message
-	 * @param accepted    Boolean if the bugreport got accepted or denied. If
+	 * @param changed     Boolean if the bugreport got accepted or denied. If
 	 *                    <code>null</code> then the bugreport just got written
+	 * @param status	  Status of the managed report                   
 	 * @return the embeded message
 	 */
-	public static MessageEmbed createReport(Member member, String description, Color color, Boolean accepted) {
+	public static MessageEmbed createReport(Member member, String description, Color color, Boolean changed, String status) {
 		EmbedBuilder eb = new EmbedBuilder();
 
 		eb.setColor(color);
 		eb.setTitle("Bugreport");
 		eb.setThumbnail(DiscordBot.getCurrentBot().getShardManager().getSelfUser().getAvatarUrl());
 		eb.setDescription(description);
+		eb.addField("Status", status, false);
 		eb.setTimestamp(OffsetDateTime.now());
 
-		if (accepted == null) {
+		if (changed == null) {
 			eb.setFooter(member.getUser().getAsTag(), member.getUser().getEffectiveAvatarUrl());
-		} else if (accepted) {
-			eb.setFooter("Angenommen von: " + member.getUser().getAsTag(), member.getUser().getEffectiveAvatarUrl());
 		} else {
-			eb.setFooter("Abgelehnt von: " + member.getUser().getAsTag(), member.getUser().getEffectiveAvatarUrl());
+			eb.setFooter("Status geändert von: " + member.getUser().getAsTag(),
+					member.getUser().getEffectiveAvatarUrl());
 		}
 
 		return eb.build();
